@@ -21,7 +21,7 @@ def current_session():
 #    if month >= 10:
 #        year += 1
 #    return "%4d-%4d" % (year-1, year)
-    return Setting("current_session").tcdnetsoc_value.first()
+    return Setting("current_session").tophat_value.first()
 
 
 def read_small_file(file):
@@ -41,7 +41,7 @@ def read_small_file(file):
         return None
 
 def _get_samba_domain_sid():
-    return LDAPObject(obj_dn='sambaDomainName=NETSOC,dc=netsoc,dc=tcd,dc=ie').sambaSID
+    return LDAPObject(obj_dn='sambaDomainName=NETSOC,dc=tophat,dc=ie').sambaSID
 
 def generate_password():
     '''Generate a random password via pwgen'''
@@ -52,7 +52,7 @@ def generate_password():
 
 
 class NDObject(LDAPObject):
-    base_dn='dc=netsoc,dc=tcd,dc=ie'
+    base_dn='dc=tophat,dc=ie'
     def can_bind(self):
         return self.get_attribute("userPassword") is not None
 
@@ -62,10 +62,10 @@ class User(NDObject):
     user.has_account() will return True. For those users who have an account, their gidNumber
     refers to their PersonalGroup (see below)'''
     rdn_attr = 'uid'
-    default_objectclass = ['tcdnetsoc-person']
+    default_objectclass = ['tophat-person']
     default_search_attrs = ['cn','uid']
 
-    root_DN = "cn=root,dc=netsoc,dc=tcd,dc=ie"
+    root_DN = "cn=root,dc=tophat,dc=ie"
 
 
     def __init__(self, uid=None, obj_dn=None):
@@ -87,7 +87,7 @@ class User(NDObject):
         return 'posixAccount' in self.objectClass
 
     def is_current_member(self):
-        return current_session() in self.tcdnetsoc_membership_year
+        return current_session() in self.tophat_membership_year
 
     def gen_samba_sid(self):
         assert self.has_account()
@@ -95,7 +95,7 @@ class User(NDObject):
 
     @staticmethod
     def bad_usernames():
-        return Setting('bad_usernames').tcdnetsoc_value
+        return Setting('bad_usernames').tophat_value
 
     @staticmethod
     def username_is_valid(name):
@@ -105,7 +105,7 @@ class User(NDObject):
         Valid usernames must match the valid_username_regex setting
         (i.e. be short and of sensible characters), and must not 
         be one of the bad_usernames (e.g. root)'''
-        regex = Setting("valid_username_regex").tcdnetsoc_value.first()
+        regex = Setting("valid_username_regex").tophat_value.first()
         return \
             re.match("^" + regex + "$", name) is not None \
             and \
@@ -138,19 +138,19 @@ class User(NDObject):
         '''Change the MySQL password for a user. When the password is changed,
         the database is automatically created'''
         if pw is None:
-            pw = self.get_attribute('tcdnetsoc_mysql_pw')
+            pw = self.get_attribute('tophat_mysql_pw')
         if pw is None:
             pw = generate_password()
         # when this field changes, the update_ldap_mysql script will notice
         # and update mysql accordingly
-        self.tcdnetsoc_mysql_pw = pw
+        self.tophat_mysql_pw = pw
 
     def get_personal_group(self):
         return PersonalGroup(self.uid)
 
     def mark_member(self):
         if not self.is_current_member():
-            self.tcdnetsoc_membership_year += current_session()
+            self.tophat_membership_year += current_session()
 
     def sendmail(self, msg, **kw):
         ''' Email the given message to this User '''
@@ -179,18 +179,18 @@ class User(NDObject):
             sendmail("account_renewed", to=self.mail, username=self.uid)
 
     def comment(self, msg):
-        self.tcdnetsoc_admin_comment += '%s: %s' % (time.asctime(), msg)
+        self.tophat_admin_comment += '%s: %s' % (time.asctime(), msg)
 
     def merge_into(self, other):
         assert self.get_state() == 'newmember'
         assert other.get_state() in ['shell','renew','bold','expired','dead']
         assert self.is_current_member()
         assert not other.is_current_member()
-        issusername = self.get_attribute("tcdnetsoc_ISS_username") or other.get_attribute("tcdnetsoc_ISS_username")
-        if other.get_attribute("tcdnetsoc_ISS_username") is not None:
-            assert other.tcdnetsoc_ISS_username == issusername
-        else:
-            other.tcdnetsoc_ISS_username = issusername
+        issusername = self.get_attribute("tophat_ISS_username") or other.get_attribute("tophat_ISS_username")
+#        if other.get_attribute("tophat_ISS_username") is not None:
+#            assert other.tophat_ISS_username == issusername
+#        else:
+#            other.tophat_ISS_username = issusername
         if self.cn != other.cn:
             lwarn("Names %s and %s don't match when renewing account %s" % (self.cn, other.cn, other.uid))
             other.comment("Renewed by account with non-matching name %s" % self.cn)
@@ -198,8 +198,8 @@ class User(NDObject):
             lwarn("Emails %s and %s don't match when renewing account %s"% (self.mail, other.mail, other.uid))
             other.comment("Renewed by account with non-matching mail %s" % self.mail)
         
-        self.tcdnetsoc_membership_year -= current_session()
-        other.tcdnetsoc_membership_year += current_session()
+        self.tophat_membership_year -= current_session()
+        other.tophat_membership_year += current_session()
         self.destroy()
 
     def passwd(self, new, old=None):
@@ -257,7 +257,7 @@ class User(NDObject):
         hasShellAcct = 'posixAccount' in self.objectClass
         canBind = self.can_bind()
         groups = list(self.memberOf)
-        membershipYears = self.tcdnetsoc_membership_year
+        membershipYears = self.tophat_membership_year
         username = self.uid
         def has(priv):
             if self.has_priv(priv):
@@ -273,7 +273,7 @@ class User(NDObject):
                 info += "no shell account\n"
         else:
             info += "Disabled account\n"
-        info += "Member of netsoc in " + ", ".join(self.tcdnetsoc_membership_year) + "\n"
+        info += "Member of TopHat in " + ", ".join(self.tophat_membership_year) + "\n"
         return info
 
     def __repr__(self):
@@ -305,7 +305,7 @@ class User(NDObject):
                     return state
             assert 0 # should be impossible to get here
         else:
-            if self.get_attribute("tcdnetsoc_saved_password") == "***newmember***":
+            if self.get_attribute("tophat_saved_password") == "***newmember***":
                 return "newmember"
             else:
                 return "archived"
@@ -320,7 +320,7 @@ class User(NDObject):
             raise Exception("User doesn't have an account, so it can't be set to %s" % newst)
 
         if (st, newst) == ("archived","newmember"):
-            self.tcdnetsoc_saved_password = "***newmember***"
+            self.tophat_saved_password = "***newmember***"
         elif newst == "newmember":
             raise Exception("that makes no sense")
         elif newst == "archived":
@@ -351,7 +351,7 @@ class User(NDObject):
 #            Privilege("shell").member += self
         else:
             if st == "newmember":
-                del self.tcdnetsoc_saved_password
+                del self.tophat_saved_password
             else:
                 Privilege(st).member -= self
             Privilege(newst).member += self
@@ -378,8 +378,8 @@ class User(NDObject):
                 # restore old password (if any)
                 if newpasswd is not None:
                     self.passwd(newpasswd)
-                elif self.get_attribute("tcdnetsoc_saved_password") is not None:
-                    self.userPassword = self.tcdnetsoc_saved_password
+                elif self.get_attribute("tophat_saved_password") is not None:
+                    self.userPassword = self.tophat_saved_password
                 else:
                     pwd = generate_password()
                     lwarn("Setting password for %s to %s" % ( self.uid, pwd))
@@ -405,7 +405,7 @@ class User(NDObject):
                 assert st != "newmember"
                 # removing shell, save old password
                 if self.can_bind():
-                    self.tcdnetsoc_saved_password = self.userPassword
+                    self.tophat_saved_password = self.userPassword
                     del self.userPassword
 
                 # possibly remove privileges
@@ -458,7 +458,7 @@ class User(NDObject):
         return s
 
     def check(self):
-        assert 'tcdnetsoc-person' in self.objectClass
+        assert 'tophat-person' in self.objectClass
 
         stategroups = [Privilege(x) for x in User.states if x not in ["archived","newmember"]]
         currentstategroups = [g for g in stategroups if self in g]
@@ -519,15 +519,16 @@ class User(NDObject):
         if 'uid' not in attrs or attrs['uid'] == "":
             attrs['uid'] = "user%d" % attrs['uidNumber']
 
-        if 'tcdnetsoc_membership_year' not in attrs:
-            attrs['tcdnetsoc_membership_year'] = [current_session()]
+        if 'tophat_membership_year' not in attrs:
+            attrs['tophat_membership_year'] = [current_session()]
         if User(attrs['uid']).exists():
             raise Exception("Uid %s is taken" % attrs['uid'])
         if not User.username_is_valid(attrs['uid']):
-            raise Exception("Invalid username %s" % attrs['uid'])
+           raise Exception("Invalid username %s" % attrs['uid'])
 
-        attrs['tcdnetsoc_saved_password'] = '***newmember***'
-        u = super(User,cls).create(**attrs)
+        attrs['tophat_saved_password'] = '***newmember***'
+
+	u = super(User,cls).create(**attrs)
 
         return u
 
@@ -648,19 +649,19 @@ class User(NDObject):
             return "%.1f%s" % (sz, name)
             
         def _get_quota(self):
-            for i in self.user.tcdnetsoc_diskquota:
+            for i in self.user.tophat_diskquota:
                 if i.startswith(self.fs + ":"):
                     return [int(x) for x in i.split(":")[2:6]]
             return None, None, None, None
 
         def _set_quota(self, l):
-            for i in self.user.tcdnetsoc_diskquota:
+            for i in self.user.tophat_diskquota:
                 if i.startswith(self.fs + ":"):
-                    self.user.tcdnetsoc_diskquota -= i
-            self.user.tcdnetsoc_diskquota += ":".join([self.fs] + [str(x) for x in l])
+                    self.user.tophat_diskquota -= i
+            self.user.tophat_diskquota += ":".join([self.fs] + [str(x) for x in l])
 
         def _get_usage(self):
-            for i in self.user.tcdnetsoc_diskusage:
+            for i in self.user.tophat_diskusage:
                 if i.startswith(self.fs + ":"):
                     return [int(x) for x in i.split(":")[2:]]
             return None, None, None, None, None, None
@@ -696,7 +697,7 @@ class User(NDObject):
 class Group(NDObject):
     '''A group of users. Groups may contain any number of users, including zero'''
     rdn_attr = 'cn'
-    default_objectclass = ['tcdnetsoc-group']
+    default_objectclass = ['tophat-group']
 
     # Allow "user in group" and "for user in group" as shorthands for
     # "user in group.member" and "for user in group.member"
@@ -725,14 +726,14 @@ class PersonalGroup(Group):
     '''A PersonalGroup is a group with the same name as a user having only that user
     as a member. Its GID is the UID of the user and its name is the username of the user'''
     rdn_attr = 'cn'
-    default_objectclass = ['tcdnetsoc-group']
+    default_objectclass = ['tophat-group']
         
     def get_user(self):
         return User(self.cn)
 
          
     def check(self):
-        assert 'tcdnetsoc-group' in self.objectClass
+        assert 'tophat-group' in self.objectClass
         user = self.get_user()
         assert user.exists()
         assert user.gidNumber == self.gidNumber
@@ -745,19 +746,19 @@ class Privilege(Group):
     '''Groups controlling access to specific services, for instance webspace or
     filestorage'''
     rdn_attr = 'cn'
-    default_objectclass = ['tcdnetsoc-privilege']
+    default_objectclass = ['tophat-privilege']
     def check(self):
-        assert 'tcdnetsoc-privilege' in self.objectClass
+        assert 'tophat-privilege' in self.objectClass
 
 
 class Service(NDObject):
     rdn_attr = 'cn'
-    default_objectclass = ['tcdnetsoc-service']
+    default_objectclass = ['tophat-service']
     def get_password(self):
         return self.get_attribute("userPassword")
 
     def has_access(self, user):
-        return len(list(Privilege.search(SearchFilter.all(tcdnetsoc_service_granted=self,
+        return len(list(Privilege.search(SearchFilter.all(tophat_service_granted=self,
                                                           member=user)))) != 0
     @classmethod
     def create(cls, **attrs):
@@ -774,7 +775,7 @@ class IDNumber(NDObject):
     The next ID is stored in the allocator object, and when a new one is requested
     the field is atomically incremented and the old value is returned"""
     rdn_attr = 'cn'
-    default_objectclass = ['tcdnetsoc-idnum']
+    default_objectclass = ['tophat-idnum']
     def _setnum(self, old, new):
         # Minor hack: we use _raw_modattrs to ensure atomicity
         # Without it, there's a race condition
@@ -797,7 +798,7 @@ class IDNumber(NDObject):
         raise e
 
     def check(self):
-        assert 'tcdnetsoc-idnum' in self.objectClass
+        assert 'tophat-idnum' in self.objectClass
 
 
 UIDAllocator = IDNumber('next-uid')
@@ -807,20 +808,20 @@ GIDAllocator = IDNumber('next-gid')
 class Setting(NDObject):
     """Arbitrary configuration-style key-value setting, stored in LDAP to be accessible from all Netsoc machines"""
     rdn_attr = 'cn'
-    default_objectclass = ['tcdnetsoc-setting']
+    default_objectclass = ['tophat-setting']
     def _setnum(self, old, new):
         # Minor hack: we use _raw_modattrs to ensure atomicity
         # Without it, there's a race condition
         self._raw_modattrs([
-            (ldap.MOD_DELETE, 'tcdnetsoc-value', str(old)),
-            (ldap.MOD_ADD, 'tcdnetsoc-value', str(new))])
+            (ldap.MOD_DELETE, 'tophat-value', str(old)),
+            (ldap.MOD_ADD, 'tophat-value', str(new))])
         
     def alloc(self):
         # try to atomically allocate a new number (UID, GID, etc)
         # attempt it 3 times in case it fails because someone else
         # is also allocating numbers
         for attempt in range(3):
-            currid = int(self.tcdnetsoc_value.first())
+            currid = int(self.tophat_value.first())
             try:
                 self._setnum(currid, currid+1)
             except ldap.NO_SUCH_ATTRIBUTE, e:
@@ -830,14 +831,14 @@ class Setting(NDObject):
         raise e
 
     def check(self):
-        assert 'tcdnetsoc-setting' in self.objectClass
+        assert 'tophat-setting' in self.objectClass
 
 
 
 Attribute('objectClass', [str])
 Attribute('serialNumber', int)
-Attribute('tcdnetsoc_membership_year', [str])
-Attribute('tcdnetsoc_ISS_username', str)
+Attribute('tophat_membership_year', [str])
+Attribute('tophat_ISS_username', str)
 Attribute('loginShell', str)
 Attribute('uid', str, match_like)
 Attribute('uidNumber', int)
@@ -846,16 +847,16 @@ Attribute('homeDirectory', str)
 Attribute('cn', str, match_like)
 Attribute('userPassword', str)
 Attribute('mail', str)
-Attribute('tcdnetsoc_admin_comment', [str])
+Attribute('tophat_admin_comment', [str])
 Attribute('member', [User])
 Attribute('memberOf', [Group], backlink='member')
-Attribute('tcdnetsoc_service_granted', [Service])
-Attribute('tcdnetsoc_granted_by_privilege', [Privilege], backlink='tcdnetsoc_service_granted')
-Attribute('tcdnetsoc_diskquota', [str])
-Attribute('tcdnetsoc_diskusage', [str])
-Attribute('tcdnetsoc_value', [str])
+Attribute('tophat_service_granted', [Service])
+Attribute('tophat_granted_by_privilege', [Privilege], backlink='tophat_service_granted')
+Attribute('tophat_diskquota', [str])
+Attribute('tophat_diskusage', [str])
+Attribute('tophat_value', [str])
 Attribute('sambaSID', str)
 Attribute('sambaPrimaryGroupSID', str)
 Attribute('sambaGroupType', int)
-Attribute('tcdnetsoc_mysql_pw', str)
-Attribute('tcdnetsoc_saved_password', str)
+Attribute('tophat_mysql_pw', str)
+Attribute('tophat_saved_password', str)

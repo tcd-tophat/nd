@@ -39,7 +39,7 @@ def check_ldap():
         else:
             raise Exception("Not bound to LDAP as root")
     try:
-        if nd.whoami() != 'dn:cn=root,dc=netsoc,dc=tcd,dc=ie':
+        if nd.whoami() != 'dn:cn=root,dc=tophat,dc=ie':
             # ldap is bound as the wrong user
             fail()
     except Exception, e:

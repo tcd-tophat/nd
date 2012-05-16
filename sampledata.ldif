@@ -1,34 +1,29 @@
 # sample data
 
-dn: uid=mu,ou=User,dc=netsoc,dc=tcd,dc=ie
-objectClass: tcdnetsoc-person
-uid: mu
-sn: Dolan
-cn: Stephen Dolan
+dn: uid=mloc,ou=User,dc=tophat,dc=ie
+objectClass: tophat-person
+uid: mloc
+cn: Colm Vize
 uidNumber: 1000
 gidNumber: 1000
-tcdnetsoc-ISS-username: sdolan
-tcdnetsoc-membership-year: 2007-2008
-tcdnetsoc-membership-year: 2008-2009
 
-dn: cn=mu,ou=PersonalGroup,ou=Group,dc=netsoc,dc=tcd,dc=ie
-cn: mu
-objectClass: tcdnetsoc-group
+dn: cn=mloc,ou=PersonalGroup,ou=Group,dc=tophat,dc=ie
+cn: mloc
+objectClass: tophat-group
 gidNumber: 1000
-member: uid=mu,ou=User,dc=netsoc,dc=tcd,dc=ie
+member: uid=mloc,ou=User,dc=tophat,dc=ie
 
-dn: uid=boardsuser1,ou=User,dc=netsoc,dc=tcd,dc=ie
-objectClass: tcdnetsoc-person
-uid: boardsuser1
-cn: <unknown>
-sn: <unknown>
-uidNumber: 3453
-tcdnetsoc-ISS-username: persona
+#dn: uid=boardsuser1,ou=User,dc=tophat,dc=ie
+#objectClass: tophat-person
+#uid: boardsuser1
+#cn: <unknown>
+#sn: <unknown>
+#uidNumber: 3453
 
 
-dn: cn=mygroup,ou=Group,dc=netsoc,dc=tcd,dc=ie
-objectClass: tcdnetsoc-group
-cn: mygroup
-gidNumber: 3432
-member: uid=mu,ou=User,dc=netsoc,dc=tcd,dc=ie
-member: uid=boardsuser1,ou=User,dc=netsoc,dc=tcd,dc=ie
+#dn: cn=mygroup,ou=Group,dc=tophat,dc=ie
+#objectClass: tophat-group
+#cn: mygroup
+#gidNumber: 3432
+#member: uid=mu,ou=User,dc=tophat,dc=ie
+#member: uid=boardsuser1,ou=User,dc=tophat,dc=ie

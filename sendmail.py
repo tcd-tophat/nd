@@ -2,7 +2,7 @@
 
 import email, email.parser, subprocess, os.path
 
-default_from_address = "support@netsoc.tcd.ie"
+default_from_address = "support@tophat.ie"
 default_template_location = os.path.abspath(os.path.dirname(__file__)) + "/messages"
 
 def sendmail(template_file, dict=None, **kwargs):

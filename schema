@@ -1,9 +1,9 @@
-# The Private Enterprise Number assigned to TCD Netsoc :D
-objectIdentifier netsoc 1.3.6.1.4.1.33566
-# Netsoc LDAP attributes
-objectIdentifier na netsoc:1
-# Netsoc LDAP objectclasses
-objectIdentifier no netsoc:2
+# The Private Enterprise Number assigned to TopHat :D
+objectIdentifier tophat 1.3.6.1.4.1.33566
+# TopHat LDAP attributes
+objectIdentifier na tophat:1
+# TopHat LDAP objectclasses
+objectIdentifier no tophat:2
 
 # OIDs for LDAP syntaxes
 objectIdentifier syntax 1.3.6.1.4.1.1466.115.121.1
@@ -17,74 +17,74 @@ objectIdentifier octetString syntax:40
 
 
 # ISS username
-attributetype ( na:1
- NAME 'tcdnetsoc-ISS-username'
- DESC 'ISS username'
- SINGLE-VALUE
- EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX directoryString )
+#attributetype ( na:1
+# NAME 'tcdtophat-ISS-username'
+# DESC 'ISS username'
+# SINGLE-VALUE
+# EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX directoryString )
 
 
 # Year of membership, e.g. "2008-2009"
 # This attribute corresponds to payment of the membership fee for that year
 # A given user often has multiple values for this attribute 
 attributetype ( na:3
- NAME 'tcdnetsoc-membership-year'
+ NAME 'tophat-membership-year'
  DESC 'Year of membership'
  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX directoryString )
 
 attributetype ( na:4
- NAME 'tcdnetsoc-admin-comment'
+ NAME 'tophat-admin-comment'
  DESC 'Comment'
  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX directoryString )
 
 
 attributetype ( na:5
- NAME 'tcdnetsoc-service-granted'
+ NAME 'tophat-service-granted'
  DESC 'Service that a privilege grants access to'
  EQUALITY distinguishedNameMatch SYNTAX distinguishedName )
 
 attributetype ( na:6
- NAME 'tcdnetsoc-granted-by-privilege'
+ NAME 'tophat-granted-by-privilege'
  DESC 'Privilege sufficient to grant access to a service'
  EQUALITY distinguishedNameMatch SYNTAX distinguishedName )
 
 attributetype ( na:7
- NAME 'tcdnetsoc-diskquota'
+ NAME 'tophat-diskquota'
  DESC 'Disk quota entry (host:fs:blocks_soft:blocks_hard:inodes_soft:inodes_hard)'
  EQUALITY caseIgnoreMatch SYNTAX directoryString )
 
 attributetype ( na:8
- NAME 'tcdnetsoc-diskusage'
+ NAME 'tophat-diskusage'
  DESC 'Disk usage entry (host:fs:blocks_used:blocks_soft:blocks_hard:inodes_used:inodes_soft:inodes_hard)'
  EQUALITY caseIgnoreMatch SYNTAX directoryString )
 
 attributetype ( na:9
- NAME 'tcdnetsoc-mysql-pw'
+ NAME 'tophat-mysql-pw'
  DESC 'MySQL password for per-user database'
  SINGLE-VALUE
  EQUALITY caseExactMatch SYNTAX directoryString )
 
 attributetype ( na:10
- NAME 'tcdnetsoc-value'
+ NAME 'tophat-value'
  DESC 'Configuration setting stored in LDAP'
  EQUALITY caseExactMatch SYNTAX directoryString )
 
 
 attributetype ( na:11
- NAME 'tcdnetsoc-saved-password'
+ NAME 'tophat-saved-password'
  DESC 'Saved password of a disabled user'
  EQUALITY octetStringMatch
  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{128} )
 
 
 
-# A member or user of Netsoc
+# A member or user of TopHat
 # This covers every person in the database. Those who are currently paid-up members
-# will have a tcdnetsoc-membership-year attribute storing the current year.
+# will have a tophat-membership-year attribute storing the current year.
 # For those who don't have usernames (e.g. members who paid but never signed up for
 # an account, the uid field is the same as the uidNumber field).
 # The RDN is given by the uid field (so, user mu may be in LDAP with the DN of
-# "uid=mu,ou=people,dc=netsoc,dc=tcd,dc=ie"
+# "uid=mu,ou=people,dc=tophat,dc=ie"
 # Details pertaining to a shell account are stored in the posixAccount objectclass
 # (see nis.schema), so that pam+ldap is possible.
 # Mail aliases are also stored here
@@ -93,15 +93,15 @@ attributetype ( na:11
 # mail, userSMIMECertificate.
 # A user may also have an amavisAccount object for amavis prefs.
 objectclass ( no:1
- NAME 'tcdnetsoc-person'
+ NAME 'tophat-person'
  DESC 'Member or user of Trinity College Dublin Internet Society'
  STRUCTURAL
  MUST (
   uidNumber $ cn )
  MAY (
-  uid $ gidNumber $ homeDirectory $ tcdnetsoc-ISS-username $ tcdnetsoc-membership-year $ 
-  tcdnetsoc-admin-comment $ mail $ userPassword $ loginShell $ tcdnetsoc-diskquota $ tcdnetsoc-diskusage $ tcdnetsoc-mysql-pw $
-  tcdnetsoc-saved-password $
+  uid $ gidNumber $ homeDirectory $ tophat-membership-year $ 
+  tophat-admin-comment $ mail $ userPassword $ loginShell $ tophat-diskquota $ tophat-diskusage $ tophat-mysql-pw $
+  tophat-saved-password $
   sambaSID $
   sambaLMPassword $ sambaNTPassword $ sambaPwdLastSet $
   sambaLogonTime $ sambaLogoffTime $ sambaKickoffTime $
@@ -113,15 +113,15 @@ objectclass ( no:1
   sambaPasswordHistory $ sambaLogonHours) )
 
 objectclass ( no:2
- NAME 'tcdnetsoc-group'
- DESC 'Group of TCD Netsoc accounts'
+ NAME 'tophat-group'
+ DESC 'Group of TopHat accounts'
  SUP posixGroup
  STRUCTURAL
  MUST ( gidNumber )
  MAY ( member $ sambaSID $ sambaGroupType ) )
 
 objectclass ( no:3
- NAME 'tcdnetsoc-idnum'
+ NAME 'tophat-idnum'
  DESC 'Object to hold an ID number'
  SUP top
  STRUCTURAL
@@ -129,22 +129,22 @@ objectclass ( no:3
 
 
 objectclass ( no:4
- NAME 'tcdnetsoc-privilege'
+ NAME 'tophat-privilege'
  DESC 'Privilege granting access for some users to some services'
- SUP tcdnetsoc-group
+ SUP tophat-group
  STRUCTURAL
- MAY ( tcdnetsoc-service-granted ) )
+ MAY ( tophat-service-granted ) )
 
 objectclass ( no:5
- NAME 'tcdnetsoc-service'
- DESC 'Service accessible by Netsoc users with the right privileges'
+ NAME 'tophat-service'
+ DESC 'Service accessible by TopHat users with the right privileges'
  STRUCTURAL
  MUST ( cn ) 
- MAY ( tcdnetsoc-granted-by-privilege $ userPassword $ uid $ mail ) )
+ MAY ( tophat-granted-by-privilege $ userPassword $ uid $ mail ) )
  
 objectclass ( no:6
- NAME 'tcdnetsoc-setting'
+ NAME 'tophat-setting'
  DESC 'Arbitrary name-value setting'
  STRUCTURAL
  MUST ( cn )
- MAY ( tcdnetsoc-value ) )
+ MAY ( tophat-value ) )

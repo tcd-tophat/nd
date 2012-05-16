@@ -349,7 +349,7 @@ class LDAPObject(object):
     @classmethod
     def create(cls, **attrs):
         '''Create an object of this class'''
-        if cls.rdn_attr not in attrs:
+	if cls.rdn_attr not in attrs:
             raise TypeError("All %s objects must have a %s field" % (cls, cls.rdn_attr))
         if hasattr(cls, "default_objectclass"):
             if 'objectClass' not in attrs:
@@ -369,10 +369,9 @@ class LDAPObject(object):
                 modlist.append((attribute.get_ldap_name(), attribute.py_to_ldap(val)))
             
         dn = tuple_to_dn(((cls.rdn_attr, attrs[cls.rdn_attr]),) + cls.cls_dn_tuple)
-        linfo("Creating %s of type %s" %(dn, cls.__name__))
-        lc.add(dn, modlist)
-        assert(LDAPClass.get_class_by_dn(dn) is cls)
-
+	linfo("Creating %s of type %s" %(dn, cls.__name__))
+	lc.add(dn, modlist)
+	assert(LDAPClass.get_class_by_dn(dn) is cls)
         ret_obj = cls(obj_dn = dn)
         
         for key in backlinks:

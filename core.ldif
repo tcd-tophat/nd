@@ -1,77 +1,82 @@
 
-dn: dc=netsoc,dc=tcd,dc=ie
+dn: dc=tophat,dc=ie
 objectClass: dcObject
 objectClass: organization
-dc: netsoc
-o: Dublin University Internet Society
+dc: tophat
+o: TopHat
 
-dn: cn=root,dc=netsoc,dc=tcd,dc=ie
+dn: cn=root,dc=tophat,dc=ie
 objectClass: organizationalRole
 cn: root
 
-dn: ou=User,dc=netsoc,dc=tcd,dc=ie
+dn: ou=User,dc=tophat,dc=ie
 objectClass: organizationalUnit
 ou: User
-description: Netsoc users, both members and non-members
+description: Tophat users, both members and non-members
 
-dn: ou=Group,dc=netsoc,dc=tcd,dc=ie
+dn: ou=Setting,dc=tophat,dc=ie
+objectClass: organizationalUnit
+ou: Setting
+description: Static settings in the LDAP tree
+
+dn: ou=Group,dc=tophat,dc=ie
 objectClass: organizationalUnit
 ou: Group
 
-dn: ou=PersonalGroup,ou=Group,dc=netsoc,dc=tcd,dc=ie
+dn: ou=PersonalGroup,ou=Group,dc=tophat,dc=ie
 objectClass: organizationalUnit
 ou: PersonalGroup
 
-dn: ou=Privilege,ou=Group,dc=netsoc,dc=tcd,dc=ie
+dn: ou=Privilege,ou=Group,dc=tophat,dc=ie
 objectClass: organizationalUnit
 ou: Privilege
 
-dn: ou=sourceprojects,ou=Group,dc=netsoc,dc=tcd,dc=ie
+dn: ou=sourceprojects,ou=Group,dc=tophat,dc=ie
 objectClass: organizationalUnit
 ou: sourceprojects
 
-dn: ou=services,ou=Group,dc=netsoc,dc=tcd,dc=ie
+dn: ou=services,ou=Group,dc=tophat,dc=ie
 objectClass: organizationalUnit
 ou: services
 
-dn: ou=hosts,dc=netsoc,dc=tcd,dc=ie
+dn: ou=hosts,dc=tophat,dc=ie
 objectClass: organizationalUnit
 ou: hosts
 
-dn: ou=IDNumber,dc=netsoc,dc=tcd,dc=ie
+dn: ou=IDNumber,dc=tophat,dc=ie
 objectClass: organizationalUnit
 ou: IDNumber
 
 
-dn: cn=next-uid,ou=IDNumber,dc=netsoc,dc=tcd,dc=ie
+dn: cn=next-uid,ou=IDNumber,dc=tophat,dc=ie
 cn: next-uid
 serialNumber: 1000
-objectClass: tcdnetsoc-idnum
+objectClass: tophat-idnum
 
-dn: cn=next-gid,ou=IDNumber,dc=netsoc,dc=tcd,dc=ie
+dn: cn=next-gid,ou=IDNumber,dc=tophat,dc=ie
 cn: next-gid
 serialNumber: 20000
-objectClass: tcdnetsoc-idnum
+objectClass: tophat-idnum
 
 
 
 
-dn: cn=webspace,ou=Privilege,ou=Group,dc=netsoc,dc=tcd,dc=ie
+dn: cn=webspace,ou=Privilege,ou=Group,dc=ie
 cn: webspace
-objectClass: tcdnetsoc-group
+objectClass: tophat-group
 gidNumber: 60000
 
-dn: cn=shell,ou=Privilege,ou=Group,dc=netsoc,dc=tcd,dc=ie
+dn: cn=shell,ou=Privilege,ou=Group,dc=tophat,dc=ie
 cn: shell
-objectClass: tcdnetsoc-group
+objectClass: tophat-group
 gidNumber: 60002
 
-dn: cn=noexpire,ou=Privilege,ou=Group,dc=netsoc,dc=tcd,dc=ie
+dn: cn=noexpire,ou=Privilege,ou=Group,dc=tophat,dc=ie
 cn: noexpire
-objectClass: tcdnetsoc-group
+objectClass: tophat-group
 gidNumber: 60003
 
-dn: cn=alwaysrenewable,ou=Privilege,ou=Group,dc=netsoc,dc=tcd,dc=ie
+dn: cn=alwaysrenewable,ou=Privilege,ou=Group,dc=tophat,dc=ie
 cn: alwaysrenewable
-objectClass: tcdnetsoc-group
+objectClass: tophat-group
 gidNumber: 60004

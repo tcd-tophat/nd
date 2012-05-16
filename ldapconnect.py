@@ -7,7 +7,7 @@ import ldap, ldapurl, ldap.sasl
 from ldaplogging import *
 
 
-uidfmt = "uid=%s,ou=User,dc=netsoc,dc=tcd,dc=ie"
+uidfmt = "uid=%s,ou=User,dc=tophat,dc=ie"
 
 _ldap_conn = None
 
@@ -77,7 +77,6 @@ def search(l, base, scope, filter, attrlist=None):
 def add(l, dn, modlist):
     ldebug("Adding %s" % modlist)
     l.add_s(dn, modlist)
-
 @with_ldap_connection
 def delete(l, dn):
     l.delete_s(dn)
