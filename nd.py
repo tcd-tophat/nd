@@ -310,7 +310,6 @@ class User(NDObject):
             else:
                 return "archived"
 
-
     def set_state(self, newst, newpasswd = None):
         assert newst in User.states
         st = self.get_state()
@@ -334,6 +333,7 @@ class User(NDObject):
 
         elif st == "archived":
             raise Exception("un-archiving accounts not yet implemented")
+    	    # FIXME: un-archiving accounts
 #            if self._has_disabled_shell():
 #                prevstate = self.loginShell[len(User.disabled_shells_base):]
 #                if newst != prevstate:
@@ -359,21 +359,17 @@ class User(NDObject):
                 # ensure GID is set
                 if self.get_attribute('gidNumber') == None:
                     self.gidNumber = self.uidNumber
-                
                 # ensure homedir is set
                 if self.get_attribute('homeDirectory') is None:
                     self.homeDirectory = '/home/' + self.uid
-
                 # ensure group exists
-                self.create_personal_group()
-
-                self.objectClass += 'posixAccount'
-
+		self.create_personal_group()
+		self.objectClass += 'posixAccount'
                 # (re-)enable Samba
-                if st == 'newmember':
-                    self.setup_samba_account()
-                else:
-                    self.objectClass += 'sambaSamAccount'
+#                if st == 'newmember':
+#                    self.setup_samba_account()
+#                else:
+#                    self.objectClass += 'sambaSamAccount'
 
                 # restore old password (if any)
                 if newpasswd is not None:
@@ -393,10 +389,10 @@ class User(NDObject):
                 # expired and newmember users get webspace
                 # renew users didn't lose it
                 # and bold/dead users don't get it without admin intervention
-                if st in ["expired", "newmember"]:
-                    self.grant_priv("webspace")
+#                if st in ["expired", "newmember"]:
+#                    self.grant_priv("webspace")
 
-                self.reset_mysql_pw()
+#                self.reset_mysql_pw()
                 
                 # FIXME quotas
             else:
@@ -415,8 +411,8 @@ class User(NDObject):
                             self.memberOf -= g
                 
                 # remove samba access
-                if 'sambaSamAccount' in self.objectClass:
-                    self.objectClass -= 'sambaSamAccount'
+#                if 'sambaSamAccount' in self.objectClass:
+#                    self.objectClass -= 'sambaSamAccount'
 
     def get_correct_state(self):
         # Does this person automatically get a shell?
@@ -545,9 +541,9 @@ class User(NDObject):
         g = PersonalGroup.create(cn = self.uid,
                                  member = [self],
                                  gidNumber = self.gidNumber)
-        g.sambaSID = g.gen_samba_sid()
-        g.sambaGroupType = 2
-        g.objectClass += 'sambaGroupMapping'
+#        g.sambaSID = g.gen_samba_sid()
+#        g.sambaGroupType = 2
+#        g.objectClass += 'sambaGroupMapping'
     
     def setup_samba_account(self):
         '''Set up a Samba account for this user (samba cannot use standard Posix account
